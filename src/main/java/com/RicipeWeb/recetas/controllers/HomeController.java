@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
-public class HelloController {
+public class HomeController {
 
-    @GetMapping("/hello")
-    public String hello() {
+    @GetMapping("/home")
+    public String home() {
         return "¡Bienvenido a la Plataforma de Recetas!";
     }
 }
