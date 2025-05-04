@@ -1,5 +1,10 @@
 package com.RicipeWeb.recetas.dtos;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class RecipeDTO {
     private Long id;
     private String title;

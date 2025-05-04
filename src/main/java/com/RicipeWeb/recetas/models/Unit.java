@@ -1,18 +1,17 @@
 package com.RicipeWeb.recetas.models;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "units")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Unit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long unitId;
+    private Long unit_id;
 
-    @Column(nullable = false, unique = true)
-    private String unitName;
+    private String unit_name;
 }

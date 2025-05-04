@@ -16,3 +16,4 @@ public class Ingredient {
     @Column(nullable = false, unique = true)
     private String name;
 }
+
