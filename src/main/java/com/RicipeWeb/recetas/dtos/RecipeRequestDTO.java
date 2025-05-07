@@ -1,20 +1,19 @@
 package com.RicipeWeb.recetas.dtos;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.List;
+import lombok.*;
 
-@Getter
-@Setter
-public class RecipeDTO {
-    private Long id;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class RecipeRequestDTO {
     private String title;
     private String description;
     private Integer prepTime;
     private Integer cookTime;
     private Integer servings;
     private String authorUsername;
-    private List<String> categoryNames;
-    // Getters y setters
+
+    private List<Long> categoryIds;
+    private List<RecipeIngredientsDTO> ingredients;
 }

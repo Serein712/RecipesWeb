@@ -9,6 +9,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "recipe_ingredients")
 public class RecipeIngredient {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,9 +22,9 @@ public class RecipeIngredient {
     @JoinColumn(name = "ingredient_id")
     private Ingredient ingredient;
 
-    private Double quantity;
-
     @ManyToOne
     @JoinColumn(name = "unit_id")
     private Unit unit;
+
+    private double quantity;
 }
