@@ -6,7 +6,8 @@ import com.RicipeWeb.recetas.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import java.security.MessageDigest;
 import java.util.Optional;
 
@@ -19,20 +20,15 @@ public class UserService {
     @Autowired
     private ModelMapper modelMapper;
 
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     public boolean registerUser(UserRegisterDTO dto) {
         if (userRepository.existsByUsername(dto.getUsername()) || userRepository.existsByEmail(dto.getEmail())) {
             return false;
         }
-
         User user = modelMapper.map(dto, User.class);
-        user.setPasswordHash(encryptPassword(dto.getPassword()));
-
+        user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
         userRepository.save(user);
         return true;
-    }
-
-    private String encryptPassword(String password) {
-        // Simplificado: usar bcrypt real en futuro
-        return Integer.toHexString(password.hashCode());
     }
 }
