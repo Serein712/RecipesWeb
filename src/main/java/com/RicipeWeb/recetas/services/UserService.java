@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import java.security.MessageDigest;
+
 import java.util.Optional;
 
 @Service
@@ -30,5 +30,13 @@ public class UserService {
         user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
         userRepository.save(user);
         return true;
+    }
+
+    public boolean validateLogin(String email, String rawPassword) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isEmpty()) return false;
+
+        User user = optionalUser.get();
+        return passwordEncoder.matches(rawPassword, user.getPasswordHash());
     }
 }
