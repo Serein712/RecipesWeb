@@ -1,10 +1,17 @@
 package com.RicipeWeb.recetas.controllers;
 
+import com.RicipeWeb.recetas.dtos.UserMeDTO;
 import com.RicipeWeb.recetas.dtos.UserRegisterDTO;
+import com.RicipeWeb.recetas.models.User;
+import com.RicipeWeb.recetas.repositories.UserRepository;
 import com.RicipeWeb.recetas.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,6 +20,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegisterDTO dto) {
@@ -23,5 +33,23 @@ public class UserController {
         } else {
             return ResponseEntity.badRequest().body("El nombre de usuario o email ya está en uso");
         }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
+        }
+
+        String email = auth.getName(); // el email se usó como "username" en UserDetails
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        UserMeDTO dto = new UserMeDTO(user.getUserId(), user.getUsername(), user.getEmail());
+
+        return ResponseEntity.ok(dto);
     }
 }
