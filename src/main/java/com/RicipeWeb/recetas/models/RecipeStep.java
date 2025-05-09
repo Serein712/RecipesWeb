@@ -11,14 +11,14 @@ import lombok.Setter;
 public class RecipeStep {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long stepId;
+    private Long step_id;
 
-    private Integer stepNumber;
+    private Integer step_number;
 
     @Column(nullable = false)
     private String instruction;
 
     @ManyToOne
-    @JoinColumn(name = "recipe_id")
+    @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe;
 }

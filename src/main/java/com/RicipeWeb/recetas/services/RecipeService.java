@@ -1,12 +1,10 @@
 package com.RicipeWeb.recetas.services;
 
-import com.RicipeWeb.recetas.dtos.IngredientDTO;
 import com.RicipeWeb.recetas.dtos.RecipeIngredientsDTO;
 import com.RicipeWeb.recetas.dtos.RecipeDTO;
 import com.RicipeWeb.recetas.dtos.RecipeRequestDTO;
 import com.RicipeWeb.recetas.models.*;
 import com.RicipeWeb.recetas.repositories.*;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class RecipeService {
@@ -46,8 +43,8 @@ public class RecipeService {
         recipe.setPrepTime(dto.getPrepTime());
         recipe.setCookTime(dto.getCookTime());
         recipe.setServings(dto.getServings());
-
         recipe.setAuthor(user);
+
         // Categorías
         Set<Category> categories = new HashSet<>();
         for (Long categoryId : dto.getCategories()) {
@@ -77,6 +74,23 @@ public class RecipeService {
 
         // Guardamos otra vez para que se guarden los ingredientes relacionados
         Recipe finalRecipe = recipeRepository.save(savedRecipe);
+
+        // Pasos
+        List<RecipeStep> stepList = new ArrayList<>();
+        int index = 1;
+        for (String stepText : dto.getSteps()) {
+            RecipeStep step = new RecipeStep();
+            step.setInstruction(stepText);
+            step.setStep_number(index++); // opcional si tienes un campo para orden
+            step.setRecipe(savedRecipe); // relación bidireccional
+            stepList.add(step);
+        }
+        //savedRecipe.setSteps(stepList);
+        savedRecipe.getSteps().clear();
+        savedRecipe.getSteps().addAll(stepList);
+
+        // Guardamos otra vez
+        finalRecipe = recipeRepository.save(savedRecipe);
 
         // Convertimos a DTO
         return convertToDTO(finalRecipe);
