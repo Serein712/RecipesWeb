@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/recipes")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true") // Ajusta si usas otro puerto para React
 public class RecipeController {
 
     private final RecipeService recipeService;

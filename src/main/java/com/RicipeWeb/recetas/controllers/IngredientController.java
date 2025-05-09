@@ -12,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/ingredients")
-@CrossOrigin(origins = "http://localhost:5173") // permite llamadas desde React
 public class IngredientController {
 
     private final IngredientService ingredientService;

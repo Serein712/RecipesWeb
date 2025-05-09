@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/units")
-@CrossOrigin(origins = "http://localhost:5173") // Ajusta el puerto si usas otro
 public class UnitController {
 
     private final UnitService unitService;
