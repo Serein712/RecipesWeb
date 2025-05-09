@@ -36,18 +36,21 @@ public class RecipeService {
         this.unitRepository = unitRepository;
     }
 
-    public RecipeDTO createRecipe(RecipeRequestDTO dto) {
+    public RecipeDTO createRecipe(RecipeRequestDTO dto, String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
         Recipe recipe = new Recipe();
         recipe.setTitle(dto.getTitle());
         recipe.setDescription(dto.getDescription());
         recipe.setPrepTime(dto.getPrepTime());
         recipe.setCookTime(dto.getCookTime());
         recipe.setServings(dto.getServings());
-        User author = userRepository.findById(1L).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        recipe.setAuthor(author);
+
+        recipe.setAuthor(user);
         // Categorías
         Set<Category> categories = new HashSet<>();
-        for (Long categoryId : dto.getCategoryIds()) {
+        for (Long categoryId : dto.getCategories()) {
             categoryRepository.findById(categoryId).ifPresent(categories::add);
         }
         recipe.setCategories(categories);
@@ -57,10 +60,10 @@ public class RecipeService {
 
         // Ingredientes
         for (RecipeIngredientsDTO ingredientDTO : dto.getIngredients()) {
-            Ingredient ingredient = ingredientRepository.findById(ingredientDTO.getIngredientId())
+            Ingredient ingredient = ingredientRepository.findById(ingredientDTO.getId())
                     .orElseThrow(() -> new RuntimeException("Ingrediente no encontrado"));
 
-            Unit unit = unitRepository.findById(ingredientDTO.getUnitId())
+            Unit unit = unitRepository.findById(ingredientDTO.getUnit_id())
                     .orElseThrow(() -> new RuntimeException("Unidad no encontrada"));
 
             RecipeIngredient ri = new RecipeIngredient();

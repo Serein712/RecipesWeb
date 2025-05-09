@@ -14,6 +14,9 @@ public class RecipeRequestDTO {
     private Integer servings;
     private String authorUsername;
 
-    private List<Long> categoryIds;
+    private List<Long> categories;
     private List<RecipeIngredientsDTO> ingredients;
+    private List<String> steps;
+
+    private String imageUrl;
 }
