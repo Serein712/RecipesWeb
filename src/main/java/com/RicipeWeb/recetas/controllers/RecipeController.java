@@ -52,4 +52,15 @@ public class RecipeController {
         RecipeDTO dto = recipeService.convertToDTO(recipe);
         return ResponseEntity.ok(dto);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<RecipeDTO> updateRecipe(
+            @PathVariable Long id,
+            @RequestBody RecipeRequestDTO dto,
+            Principal principal) {
+
+        String email = principal.getName(); // extraído del JWT
+        RecipeDTO updated = recipeService.updateRecipe(id, dto, email);
+        return ResponseEntity.ok(updated);
+    }
 }

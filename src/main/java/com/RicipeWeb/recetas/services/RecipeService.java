@@ -3,10 +3,13 @@ package com.RicipeWeb.recetas.services;
 import com.RicipeWeb.recetas.dtos.*;
 import com.RicipeWeb.recetas.models.*;
 import com.RicipeWeb.recetas.repositories.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class RecipeService {
@@ -92,6 +95,58 @@ public class RecipeService {
         return convertToDTO(finalRecipe);
     }
 
+    public RecipeDTO updateRecipe(Long recipeId, RecipeRequestDTO dto, String email) {
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Receta no encontrada"));
+
+        // 🔒 Verificación de autor
+        if (!recipe.getAuthor().getEmail().equals(email)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No eres el autor de esta receta");
+        }
+
+        // 🛠 Actualización de campos
+        recipe.setTitle(dto.getTitle());
+        recipe.setDescription(dto.getDescription());
+        recipe.setPrepTime(dto.getPrepTime());
+        recipe.setCookTime(dto.getCookTime());
+        recipe.setServings(dto.getServings());
+        recipe.setImageUrl(dto.getImageUrl());
+
+        // Actualizar categorías
+        Set<Category> newCats = dto.getCategories().stream()
+                .map(catId -> categoryRepository.findById(catId)
+                        .orElseThrow(() -> new RuntimeException("Categoría no encontrada")))
+                .collect(Collectors.toSet());
+        recipe.setCategories(newCats);
+
+        // Ingredientes (reemplazar)
+        recipe.getRecipeIngredients().clear();
+        for (RecipeIngredientsDTO ing : dto.getIngredients()) {
+            RecipeIngredient ri = new RecipeIngredient();
+            ri.setRecipe(recipe);
+            ri.setIngredient(ingredientRepository.findById(ing.getId())
+                    .orElseThrow(() -> new RuntimeException("Ingrediente no encontrado")));
+            ri.setUnit(unitRepository.findById(ing.getUnit_id())
+                    .orElseThrow(() -> new RuntimeException("Unidad no encontrada")));
+            ri.setQuantity(ing.getQuantity());
+            recipe.getRecipeIngredients().add(ri);
+        }
+
+        // Pasos
+        recipe.getSteps().clear();
+        int index = 1;
+        for (String instruction : dto.getSteps()) {
+            RecipeStep step = new RecipeStep();
+            step.setStep_number(index++);
+            step.setInstruction(instruction);
+            step.setRecipe(recipe);
+            recipe.getSteps().add(step);
+        }
+
+        Recipe saved = recipeRepository.save(recipe);
+        return convertToDTO(saved);
+    }
+
     public RecipeDTO convertToDTO(Recipe recipe) {
         RecipeDTO dto = new RecipeDTO();
         dto.setId(recipe.getRecipeId());
@@ -101,6 +156,9 @@ public class RecipeService {
         dto.setCookTime(recipe.getCookTime());
         dto.setServings(recipe.getServings());
         dto.setImageUrl(recipe.getImageUrl());
+        dto.setAuthorEmail(recipe.getAuthor().getEmail());
+        dto.setAuthorUsername(recipe.getAuthor().getUsername());
+
 
         // Categorías
         List<String> categoryNames = recipe.getCategories()

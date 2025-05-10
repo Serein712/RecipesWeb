@@ -19,6 +19,7 @@ public class RecipeDTO {
     private Integer servings;
 
     private String authorUsername;
+    private String authorEmail;
 
     private List<String> categoryNames;
     private List<RecipeIngredientDTO> ingredients;

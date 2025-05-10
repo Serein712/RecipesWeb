@@ -19,7 +19,10 @@ public class Recipe {
     private Long recipeId;
 
     private String title;
+
+    @Column(length = 1024)
     private String description;
+
     private Integer prepTime;
     private Integer cookTime;
     private Integer servings;
