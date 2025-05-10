@@ -147,6 +147,17 @@ public class RecipeService {
         return convertToDTO(saved);
     }
 
+    public void deleteRecipe(Long id, String email) {
+        Recipe recipe = recipeRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (!recipe.getAuthor().getEmail().equals(email)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No autorizado");
+        }
+
+        recipeRepository.delete(recipe);
+    }
+
     public RecipeDTO convertToDTO(Recipe recipe) {
         RecipeDTO dto = new RecipeDTO();
         dto.setId(recipe.getRecipeId());
