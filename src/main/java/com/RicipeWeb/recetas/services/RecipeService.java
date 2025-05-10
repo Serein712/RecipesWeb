@@ -1,17 +1,12 @@
 package com.RicipeWeb.recetas.services;
 
-import com.RicipeWeb.recetas.dtos.RecipeIngredientsDTO;
-import com.RicipeWeb.recetas.dtos.RecipeDTO;
-import com.RicipeWeb.recetas.dtos.RecipeRequestDTO;
+import com.RicipeWeb.recetas.dtos.*;
 import com.RicipeWeb.recetas.models.*;
 import com.RicipeWeb.recetas.repositories.*;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class RecipeService {
@@ -43,6 +38,7 @@ public class RecipeService {
         recipe.setPrepTime(dto.getPrepTime());
         recipe.setCookTime(dto.getCookTime());
         recipe.setServings(dto.getServings());
+        recipe.setImageUrl(dto.getImageUrl());
         recipe.setAuthor(user);
 
         // Categorías
@@ -96,7 +92,7 @@ public class RecipeService {
         return convertToDTO(finalRecipe);
     }
 
-    private RecipeDTO convertToDTO(Recipe recipe) {
+    public RecipeDTO convertToDTO(Recipe recipe) {
         RecipeDTO dto = new RecipeDTO();
         dto.setId(recipe.getRecipeId());
         dto.setTitle(recipe.getTitle());
@@ -104,13 +100,47 @@ public class RecipeService {
         dto.setPrepTime(recipe.getPrepTime());
         dto.setCookTime(recipe.getCookTime());
         dto.setServings(recipe.getServings());
+        dto.setImageUrl(recipe.getImageUrl());
 
+        // Categorías
         List<String> categoryNames = recipe.getCategories()
                 .stream()
                 .map(Category::getName)
                 .toList();
         dto.setCategoryNames(categoryNames);
 
+        // Ingredientes
+        List<RecipeIngredientDTO> ingredients = recipe.getRecipeIngredients()
+                .stream()
+                .map(ri -> new RecipeIngredientDTO(
+                        ri.getIngredient().getName(),
+                        ri.getQuantity(),
+                        ri.getUnit().getUnit_name()
+                ))
+                .toList();
+        dto.setIngredients(ingredients);
+
+        // Pasos
+        List<String> steps = recipe.getSteps()
+                .stream()
+                .sorted(Comparator.comparing(RecipeStep::getStep_number)) // Asegura orden
+                .map(RecipeStep::getInstruction)
+                .toList();
+        dto.setSteps(steps);
+
         return dto;
+    }
+
+    public List<RecipeSummaryDTO> getAllRecipes() {
+        List<Recipe> recipes = recipeRepository.findAll();
+
+        return recipes.stream().map(r -> new RecipeSummaryDTO(
+                r.getRecipeId(),
+                r.getTitle(),
+                r.getImageUrl(),
+                r.getDescription().length() > 100
+                        ? r.getDescription().substring(0, 100) + "..."
+                        : r.getDescription()
+        )).toList();
     }
 }

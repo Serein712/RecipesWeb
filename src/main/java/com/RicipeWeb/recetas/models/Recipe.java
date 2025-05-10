@@ -23,6 +23,7 @@ public class Recipe {
     private Integer prepTime;
     private Integer cookTime;
     private Integer servings;
+    private String imageUrl;
 
     @ManyToOne
     @JoinColumn(name = "author_id")
