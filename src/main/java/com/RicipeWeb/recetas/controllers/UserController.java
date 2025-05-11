@@ -1,6 +1,7 @@
 package com.RicipeWeb.recetas.controllers;
 
-import com.RicipeWeb.recetas.dtos.UserMeDTO;
+
+import com.RicipeWeb.recetas.dtos.UserProfileDTO;
 import com.RicipeWeb.recetas.dtos.UserRegisterDTO;
 import com.RicipeWeb.recetas.models.User;
 import com.RicipeWeb.recetas.repositories.UserRepository;
@@ -13,6 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/users")
@@ -35,7 +38,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/me")
+    /*@GetMapping("/me")
     public ResponseEntity<?> getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -49,6 +52,19 @@ public class UserController {
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
         UserMeDTO dto = new UserMeDTO(user.getUserId(), user.getUsername(), user.getEmail());
+
+        return ResponseEntity.ok(dto);
+    }*/
+    @GetMapping("/me")
+    public ResponseEntity<UserProfileDTO> getCurrentUser(Principal principal) {
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        UserProfileDTO dto = new UserProfileDTO();
+        dto.setEmail(user.getEmail());
+        dto.setRole(user.getRole().name());
+        dto.setName(user.getUsername()); // si tienes nombre
+        //dto.setCreatedAt(user.getCreatedAt()); // si tienes fecha de registro
 
         return ResponseEntity.ok(dto);
     }

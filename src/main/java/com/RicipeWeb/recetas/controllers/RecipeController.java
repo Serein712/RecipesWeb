@@ -38,10 +38,21 @@ public class RecipeController {
         return ResponseEntity.ok(createdRecipe);
     }
 
-    @GetMapping
+    /*@GetMapping
     public ResponseEntity<List<RecipeSummaryDTO>> getAllRecipes() {
         List<RecipeSummaryDTO> recipeSummaries = recipeService.getAllRecipes();
         return ResponseEntity.ok(recipeSummaries);
+    }*/
+
+    @GetMapping
+    public ResponseEntity<List<RecipeSummaryDTO>> getAllRecipes(
+            @RequestParam(required = false) String author) {
+
+        List<RecipeSummaryDTO> recipes = (author == null || author.isBlank())
+                ? recipeService.getAllRecipes()
+                : recipeService.getRecipesByAuthor(author);
+
+        return ResponseEntity.ok(recipes);
     }
 
     @GetMapping("/{id}")
@@ -70,4 +81,5 @@ public class RecipeController {
         recipeService.deleteRecipe(id, email);
         return ResponseEntity.noContent().build();
     }
+
 }
