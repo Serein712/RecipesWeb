@@ -44,9 +44,9 @@ public class JwtUtil {
     /**
      * Genera un token JWT sin claims personalizados
      */
-    public String generateToken(UserDetails userDetails) {
+    /*public String generateToken(UserDetails userDetails) {
         return generateToken(Map.of(), userDetails.getUsername());
-    }
+    }*/
 
     /**
      * Extrae el "subject" (usualmente el email) del token

@@ -44,7 +44,7 @@ public class RecipeController {
         return ResponseEntity.ok(recipeSummaries);
     }*/
 
-    @GetMapping
+    /*@GetMapping
     public ResponseEntity<List<RecipeSummaryDTO>> getAllRecipes(
             @RequestParam(required = false) String author) {
 
@@ -53,6 +53,26 @@ public class RecipeController {
                 : recipeService.getRecipesByAuthor(author);
 
         return ResponseEntity.ok(recipes);
+    }*/
+
+    @GetMapping
+    public ResponseEntity<List<RecipeSummaryDTO>> getAllRecipes(
+            @RequestParam(required = false) String author,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) Long category,
+            @RequestParam(required = false) Integer minRating,
+            @RequestParam(required = false) Integer maxPrepTime) {
+
+        /*System.out.println("getAllRecipes search: " + search);
+        System.out.println("author: " + author);
+        System.out.println("category: " + category);
+        System.out.println("minRating: " + minRating);
+        System.out.println("maxPrepTime: " + maxPrepTime);*/
+
+        List<RecipeSummaryDTO> results = recipeService.filterRecipes(
+                search, author, category, minRating, maxPrepTime
+        );
+        return ResponseEntity.ok(results);
     }
 
     @GetMapping("/{id}")

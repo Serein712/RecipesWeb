@@ -215,8 +215,35 @@ public class RecipeService {
                         : r.getDescription()
         )).toList();
     }*/
-    public List<RecipeSummaryDTO> getAllRecipes() {
+    /*public List<RecipeSummaryDTO> getAllRecipes() {
         List<Recipe> recipes = recipeRepository.findAll();
+
+        return recipes.stream().map(r -> {
+            double avgRating = commentRepository.findByRecipe(r)
+                    .stream()
+                    .mapToInt(RecipeComment::getRating)
+                    .average()
+                    .orElse(0);
+
+            return new RecipeSummaryDTO(
+                    r.getRecipeId(),
+                    r.getTitle(),
+                    r.getImageUrl(),
+                    r.getDescription().length() > 100
+                            ? r.getDescription().substring(0, 100) + "..."
+                            : r.getDescription(),
+                    avgRating
+            );
+        }).toList();
+    }*/
+    public List<RecipeSummaryDTO> getAllRecipes(String search) {
+        List<Recipe> recipes;
+
+        if (search != null && !search.isBlank()) {
+            recipes = recipeRepository.findByTitleContainingIgnoreCase(search);
+        } else {
+            recipes = recipeRepository.findAll();
+        }
 
         return recipes.stream().map(r -> {
             double avgRating = commentRepository.findByRecipe(r)
@@ -251,7 +278,7 @@ public class RecipeService {
                         : r.getDescription()
         )).toList();
     }*/
-    public List<RecipeSummaryDTO> getRecipesByAuthor(String email) {
+    /*public List<RecipeSummaryDTO> getRecipesByAuthor(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Autor no encontrado"));
 
@@ -274,5 +301,93 @@ public class RecipeService {
                     avgRating
             );
         }).toList();
+    }*/
+    public List<RecipeSummaryDTO> getRecipesByAuthor(String email, String search) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Autor no encontrado"));
+
+        List<Recipe> recipes = recipeRepository.findByAuthor(user);
+
+        if (search != null && !search.isBlank()) {
+            recipes = recipes.stream()
+                    .filter(r -> r.getTitle().toLowerCase().contains(search.toLowerCase()))
+                    .toList();
+        }
+
+        return recipes.stream().map(r -> {
+            double avgRating = commentRepository.findByRecipe(r)
+                    .stream()
+                    .mapToInt(RecipeComment::getRating)
+                    .average()
+                    .orElse(0);
+
+            return new RecipeSummaryDTO(
+                    r.getRecipeId(),
+                    r.getTitle(),
+                    r.getImageUrl(),
+                    r.getDescription().length() > 100
+                            ? r.getDescription().substring(0, 100) + "..."
+                            : r.getDescription(),
+                    avgRating
+            );
+        }).toList();
     }
+
+    public List<RecipeSummaryDTO> filterRecipes(
+            String search,
+            String author,
+            Long categoryId,
+            Integer minRating,
+            Integer maxPrepTime
+    ){
+        List<Recipe> recipes;
+
+        if (author != null && !author.isBlank()) {
+            User user = userRepository.findByEmail(author)
+                    .orElseThrow(() -> new UsernameNotFoundException("Autor no encontrado"));
+            recipes = recipeRepository.findByAuthor(user);
+        } else {
+            recipes = recipeRepository.findAll();
+        }
+        /*System.out.println("Filtrando por título: " + search);
+        System.out.println("Filtrando por autor: " + author);
+        System.out.println("Filtrando por categoría: " + categoryId);
+        System.out.println("Filtrando por minRating: " + minRating);
+        System.out.println("Filtrando por maxPrepTime: " + maxPrepTime);*/
+
+        // Filtros en memoria combinados
+        return recipes.stream()
+                .filter(r -> search == null || r.getTitle().toLowerCase().contains(search.toLowerCase()))
+                .filter(r -> maxPrepTime == null || r.getPrepTime() <= maxPrepTime)
+                .filter(r -> categoryId == null || r.getCategories().stream()
+                        .anyMatch(cat -> cat.getCategory_id().equals(categoryId)))
+                .filter(r -> {
+                    if (minRating == null) return true;
+                    double avg = commentRepository.findByRecipe(r)
+                            .stream()
+                            .mapToInt(RecipeComment::getRating)
+                            .average()
+                            .orElse(0);
+                    return avg >= minRating;
+                })
+                .map(r -> {
+                    double avg = commentRepository.findByRecipe(r)
+                            .stream()
+                            .mapToInt(RecipeComment::getRating)
+                            .average()
+                            .orElse(0);
+
+                    return new RecipeSummaryDTO(
+                            r.getRecipeId(),
+                            r.getTitle(),
+                            r.getImageUrl(),
+                            r.getDescription().length() > 100
+                                    ? r.getDescription().substring(0, 100) + "..."
+                                    : r.getDescription(),
+                            avg
+                    );
+                })
+                .toList();
+    }
+
 }
