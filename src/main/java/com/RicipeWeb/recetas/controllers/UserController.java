@@ -3,6 +3,7 @@ package com.RicipeWeb.recetas.controllers;
 
 import com.RicipeWeb.recetas.dtos.UserProfileDTO;
 import com.RicipeWeb.recetas.dtos.UserRegisterDTO;
+import com.RicipeWeb.recetas.dtos.UserUpdateDTO;
 import com.RicipeWeb.recetas.models.User;
 import com.RicipeWeb.recetas.repositories.UserRepository;
 import com.RicipeWeb.recetas.services.UserService;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -26,6 +28,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegisterDTO dto) {
@@ -67,5 +72,28 @@ public class UserController {
         //dto.setCreatedAt(user.getCreatedAt()); // si tienes fecha de registro
 
         return ResponseEntity.ok(dto);
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<?> updateProfile(@RequestBody UserUpdateDTO dto, Principal principal) {
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+
+        if (!user.getEmail().equals(dto.getEmail()) && userRepository.existsByEmail(dto.getEmail())) {
+            return ResponseEntity.badRequest().body("El email ya está en uso");
+        }
+
+        if (dto.getNewPassword() != null && !dto.getNewPassword().isBlank()) {
+            if (dto.getCurrentPassword() == null || !passwordEncoder.matches(dto.getCurrentPassword(), user.getPasswordHash())) {
+                return ResponseEntity.badRequest().body("La contraseña actual no es válida");
+            }
+            user.setPasswordHash(passwordEncoder.encode(dto.getNewPassword()));
+        }
+
+        user.setEmail(dto.getEmail());
+        user.setUsername(dto.getName());
+
+        userRepository.save(user);
+        return ResponseEntity.ok("Perfil actualizado");
     }
 }
