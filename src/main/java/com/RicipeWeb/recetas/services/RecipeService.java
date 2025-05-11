@@ -21,6 +21,8 @@ public class RecipeService {
     private final UnitRepository unitRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private RecipeCommentRepository commentRepository;
 
     public RecipeService(RecipeRepository recipeRepository,
                          CategoryRepository categoryRepository,
@@ -201,7 +203,7 @@ public class RecipeService {
         return dto;
     }
 
-    public List<RecipeSummaryDTO> getAllRecipes() {
+    /*public List<RecipeSummaryDTO> getAllRecipes() {
         List<Recipe> recipes = recipeRepository.findAll();
 
         return recipes.stream().map(r -> new RecipeSummaryDTO(
@@ -212,9 +214,30 @@ public class RecipeService {
                         ? r.getDescription().substring(0, 100) + "..."
                         : r.getDescription()
         )).toList();
+    }*/
+    public List<RecipeSummaryDTO> getAllRecipes() {
+        List<Recipe> recipes = recipeRepository.findAll();
+
+        return recipes.stream().map(r -> {
+            double avgRating = commentRepository.findByRecipe(r)
+                    .stream()
+                    .mapToInt(RecipeComment::getRating)
+                    .average()
+                    .orElse(0);
+
+            return new RecipeSummaryDTO(
+                    r.getRecipeId(),
+                    r.getTitle(),
+                    r.getImageUrl(),
+                    r.getDescription().length() > 100
+                            ? r.getDescription().substring(0, 100) + "..."
+                            : r.getDescription(),
+                    avgRating
+            );
+        }).toList();
     }
 
-    public List<RecipeSummaryDTO> getRecipesByAuthor(String email) {
+    /*public List<RecipeSummaryDTO> getRecipesByAuthor(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Autor no encontrado"));
 
@@ -227,5 +250,29 @@ public class RecipeService {
                         ? r.getDescription().substring(0, 100) + "..."
                         : r.getDescription()
         )).toList();
+    }*/
+    public List<RecipeSummaryDTO> getRecipesByAuthor(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Autor no encontrado"));
+
+        List<Recipe> recipes = recipeRepository.findByAuthor(user);
+
+        return recipes.stream().map(r -> {
+            double avgRating = commentRepository.findByRecipe(r)
+                    .stream()
+                    .mapToInt(RecipeComment::getRating)
+                    .average()
+                    .orElse(0);
+
+            return new RecipeSummaryDTO(
+                    r.getRecipeId(),
+                    r.getTitle(),
+                    r.getImageUrl(),
+                    r.getDescription().length() > 100
+                            ? r.getDescription().substring(0, 100) + "..."
+                            : r.getDescription(),
+                    avgRating
+            );
+        }).toList();
     }
 }

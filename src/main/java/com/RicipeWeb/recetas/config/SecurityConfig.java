@@ -37,7 +37,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/home","/api/auth/login", "/api/users",
                                 "/api/ingredients", "/api/units", "/api/categories",
-                                "/api/recipes", "/api/recipes/{id}").permitAll()
+                                "/api/recipes", "/api/recipes/{id}",
+                                "/api/recipes/{id}/rating", "/api/recipes/{id}/comments").permitAll()
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)

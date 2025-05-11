@@ -10,4 +10,5 @@ public class RecipeSummaryDTO {
     private String title;
     private String imageUrl;
     private String shortDescription;
+    private Double averageRating;
 }
