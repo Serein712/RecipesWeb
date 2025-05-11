@@ -24,5 +24,14 @@ public class User {
     @Column(nullable = false)
     private String passwordHash;
 
-    // Getters y setters
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Role role = Role.USER;
+
+    public enum Role {
+        ADMIN,
+        MODERATOR,
+        PUBLISHER,
+        USER
+    }
 }

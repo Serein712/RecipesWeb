@@ -2,6 +2,8 @@ package com.RicipeWeb.recetas.controllers;
 
 import com.RicipeWeb.recetas.config.JwtUtil;
 import com.RicipeWeb.recetas.dtos.LoginRequestDTO;
+import com.RicipeWeb.recetas.models.User;
+import com.RicipeWeb.recetas.repositories.UserRepository;
 import com.RicipeWeb.recetas.services.CustomUserDetailsService;
 import com.RicipeWeb.recetas.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,9 +17,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -28,6 +33,9 @@ public class AuthController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private CustomUserDetailsService userDetailsService;
@@ -41,8 +49,14 @@ public class AuthController {
                     )
             );
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(loginDTO.getEmail());
-            String token = jwtUtil.generateToken(userDetails);
+            /*UserDetails userDetails = userDetailsService.loadUserByUsername(loginDTO.getEmail());
+            String token = jwtUtil.generateToken(userDetails);*/
+            User user = userRepository.findByEmail(loginDTO.getEmail())
+                    .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("role", user.getRole().name());
+
+            String token = jwtUtil.generateToken(claims, user.getEmail());
 
             return ResponseEntity.ok(Collections.singletonMap("token", token));
         } catch (Exception e) {
