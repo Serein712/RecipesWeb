@@ -9,9 +9,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RecipeCommentRepository extends JpaRepository<RecipeComment, Long> {
-    List<RecipeComment> findByRecipe(Recipe recipe);
+
     Optional<RecipeComment> findByRecipeAndAuthor(Recipe recipe, User author);
+
     boolean existsByRecipeAndAuthor(Recipe recipe, User author);
 
+    List<RecipeComment> findByRecipe(Recipe recipe);
     List<RecipeComment> findAllByOrderByCreatedAtDesc();
+
+    void deleteAllByAuthor(User author);
+    void deleteAllByRecipe(Recipe recipe);
 }

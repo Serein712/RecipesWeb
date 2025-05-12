@@ -9,6 +9,7 @@ import com.RicipeWeb.recetas.models.User;
 import com.RicipeWeb.recetas.repositories.RecipeCommentRepository;
 import com.RicipeWeb.recetas.repositories.RecipeRepository;
 import com.RicipeWeb.recetas.repositories.UserRepository;
+import com.RicipeWeb.recetas.services.AdminService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,11 +29,13 @@ public class AdminController {
     private final UserRepository userRepository;
     private final RecipeRepository recipeRepository;
     private final RecipeCommentRepository commentRepository;
+    private final AdminService adminService;
 
-    public AdminController(UserRepository userRepository, RecipeRepository recipeRepository, RecipeCommentRepository commentRepository) {
+    public AdminController(UserRepository userRepository, RecipeRepository recipeRepository, RecipeCommentRepository commentRepository, AdminService adminService) {
         this.userRepository = userRepository;
         this.recipeRepository = recipeRepository;
         this.commentRepository = commentRepository;
+        this.adminService = adminService;
     }
 
     @GetMapping("/users")
@@ -59,7 +62,19 @@ public class AdminController {
 
     @DeleteMapping("/users/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        userRepository.deleteById(id);
+        /*User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+        // Eliminar comentarios primero
+        commentRepository.deleteAllByAuthor(user);
+
+        // Eliminar recetas
+        recipeRepository.deleteAllByAuthor(user);
+
+        // Finalmente, eliminar el usuario
+        userRepository.delete(user);*/
+        adminService.deleteUserById(id);
+
         return ResponseEntity.noContent().build();
     }
 
