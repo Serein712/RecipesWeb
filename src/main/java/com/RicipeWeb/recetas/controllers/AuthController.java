@@ -5,18 +5,12 @@ import com.RicipeWeb.recetas.dtos.LoginRequestDTO;
 import com.RicipeWeb.recetas.models.User;
 import com.RicipeWeb.recetas.repositories.UserRepository;
 import com.RicipeWeb.recetas.services.CustomUserDetailsService;
-import com.RicipeWeb.recetas.services.UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,14 +42,12 @@ public class AuthController {
                             loginDTO.getEmail(), loginDTO.getPassword()
                     )
             );
-
-            /*UserDetails userDetails = userDetailsService.loadUserByUsername(loginDTO.getEmail());
-            String token = jwtUtil.generateToken(userDetails);*/
+            
             User user = userRepository.findByEmail(loginDTO.getEmail())
                     .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
             Map<String, Object> claims = new HashMap<>();
             claims.put("role", user.getRole().name());
-
+            claims.put("nickname", user.getUsername());
             String token = jwtUtil.generateToken(claims, user.getEmail());
 
             return ResponseEntity.ok(Collections.singletonMap("token", token));

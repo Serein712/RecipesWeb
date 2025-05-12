@@ -349,11 +349,6 @@ public class RecipeService {
         } else {
             recipes = recipeRepository.findAll();
         }
-        /*System.out.println("Filtrando por título: " + search);
-        System.out.println("Filtrando por autor: " + author);
-        System.out.println("Filtrando por categoría: " + categoryId);
-        System.out.println("Filtrando por minRating: " + minRating);
-        System.out.println("Filtrando por maxPrepTime: " + maxPrepTime);*/
 
         // Filtros en memoria combinados
         return recipes.stream()

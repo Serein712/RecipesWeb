@@ -21,7 +21,7 @@ public class IngredientService {
     }
 
     public List<IngredientDTO> getAllIngredients() {
-        return ingredientRepository.findAll()
+        return ingredientRepository.findAllByOrderByNameAsc()
                 .stream()
                 .map(ingredient -> new IngredientDTO(ingredient.getIngredientId(), ingredient.getName()))
                 .toList();
