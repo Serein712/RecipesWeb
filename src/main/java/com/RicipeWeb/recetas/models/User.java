@@ -3,7 +3,9 @@ package com.RicipeWeb.recetas.models;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter @Setter
@@ -23,6 +25,9 @@ public class User {
 
     @Column(nullable = false)
     private String passwordHash;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)

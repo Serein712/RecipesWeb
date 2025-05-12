@@ -12,4 +12,6 @@ public interface RecipeCommentRepository extends JpaRepository<RecipeComment, Lo
     List<RecipeComment> findByRecipe(Recipe recipe);
     Optional<RecipeComment> findByRecipeAndAuthor(Recipe recipe, User author);
     boolean existsByRecipeAndAuthor(Recipe recipe, User author);
+
+    List<RecipeComment> findAllByOrderByCreatedAtDesc();
 }

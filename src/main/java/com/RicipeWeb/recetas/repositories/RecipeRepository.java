@@ -9,4 +9,6 @@ import java.util.List;
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     List<Recipe> findByAuthor(User author);
     List<Recipe> findByTitleContainingIgnoreCase(String title);
+
+    int countByAuthor(User user);
 }
