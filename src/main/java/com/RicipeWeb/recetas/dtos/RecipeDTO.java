@@ -3,7 +3,6 @@ package com.RicipeWeb.recetas.dtos;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.List;
 
 @Getter
@@ -20,6 +19,7 @@ public class RecipeDTO {
 
     private String authorUsername;
     private String authorEmail;
+    private Long authorId;
 
     private List<String> categoryNames;
     private List<RecipeIngredientDTO> ingredients;

@@ -5,6 +5,7 @@ import com.RicipeWeb.recetas.models.RecipeComment;
 import com.RicipeWeb.recetas.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,4 +20,6 @@ public interface RecipeCommentRepository extends JpaRepository<RecipeComment, Lo
 
     void deleteAllByAuthor(User author);
     void deleteAllByRecipe(Recipe recipe);
+
+    List<RecipeComment> findTop10ByRecipeAuthorOrderByCreatedAtDesc(User author);
 }

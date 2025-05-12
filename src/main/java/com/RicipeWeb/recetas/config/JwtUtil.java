@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import javax.crypto.SecretKey;
 
@@ -23,13 +22,11 @@ public class JwtUtil {
 
     @PostConstruct
     public void init() {
-        // Genera una clave secreta una vez (mejor usar una fija en producción)
+        // Genera clave secreta
         this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     }
 
-    /**
-     * Genera un token JWT con claims personalizados
-     */
+    //Genera un token JWT con claims personalizados
     public String generateToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
@@ -37,51 +34,31 @@ public class JwtUtil {
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
-                .setHeaderParam(Header.TYPE, Header.JWT_TYPE) // "typ": "JWT"
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                 .compact();
     }
 
-    /**
-     * Genera un token JWT sin claims personalizados
-     */
-    /*public String generateToken(UserDetails userDetails) {
-        return generateToken(Map.of(), userDetails.getUsername());
-    }*/
-
-    /**
-     * Extrae el "subject" (usualmente el email) del token
-     */
+    //Extrae el "subject"(el email)
     public String extractUsername(String token) {
         return getAllClaims(token).getSubject();
     }
 
-    /**
-     * Extrae el claim "role", si existe
-     */
     public String extractRole(String token) {
         Object role = getAllClaims(token).get("role");
         return role != null ? role.toString() : null;
     }
 
-    /**
-     * Verifica si el token es válido para el usuario
-     */
+    //Verificar el token para el usuario
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
-    /**
-     * Verifica si el token está expirado
-     */
     private boolean isTokenExpired(String token) {
         Date expiration = getAllClaims(token).getExpiration();
         return expiration.before(new Date());
     }
 
-    /**
-     * Obtiene todos los claims del token
-     */
     private Claims getAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)

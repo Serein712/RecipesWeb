@@ -1,7 +1,6 @@
 package com.RicipeWeb.recetas.dtos;
 
 import lombok.Data;
-
 import java.time.LocalDateTime;
 
 @Data

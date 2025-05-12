@@ -54,7 +54,7 @@ public class RecipeService {
         }
         recipe.setCategories(categories);
 
-        // Guardamos receta base primero (para poder asociar ingredientes que dependen de su ID)
+        // Guardar receta base primero (para poder asociar ingredientes que dependen de su ID)
         Recipe savedRecipe = recipeRepository.save(recipe);
 
         // Ingredientes
@@ -71,10 +71,10 @@ public class RecipeService {
             ri.setUnit(unit);
             ri.setQuantity(ingredientDTO.getQuantity());
 
-            savedRecipe.getRecipeIngredients().add(ri); // Asegúrate de tener el set creado en la entidad
+            savedRecipe.getRecipeIngredients().add(ri);
         }
 
-        // Guardamos otra vez para que se guarden los ingredientes relacionados
+        // Guardamos otra vez para guardar sus ingredientes
         Recipe finalRecipe = recipeRepository.save(savedRecipe);
 
         // Pasos
@@ -83,8 +83,8 @@ public class RecipeService {
         for (String stepText : dto.getSteps()) {
             RecipeStep step = new RecipeStep();
             step.setInstruction(stepText);
-            step.setStep_number(index++); // opcional si tienes un campo para orden
-            step.setRecipe(savedRecipe); // relación bidireccional
+            step.setStep_number(index++);
+            step.setRecipe(savedRecipe); //bidireccional
             stepList.add(step);
         }
         //savedRecipe.setSteps(stepList);
@@ -94,7 +94,6 @@ public class RecipeService {
         // Guardamos otra vez
         finalRecipe = recipeRepository.save(savedRecipe);
 
-        // Convertimos a DTO
         return convertToDTO(finalRecipe);
     }
 
@@ -102,12 +101,10 @@ public class RecipeService {
         Recipe recipe = recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Receta no encontrada"));
 
-        // 🔒 Verificación de autor
         if (!recipe.getAuthor().getEmail().equals(email)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No eres el autor de esta receta");
         }
 
-        // 🛠 Actualización de campos
         recipe.setTitle(dto.getTitle());
         recipe.setDescription(dto.getDescription());
         recipe.setPrepTime(dto.getPrepTime());
@@ -115,14 +112,14 @@ public class RecipeService {
         recipe.setServings(dto.getServings());
         recipe.setImageUrl(dto.getImageUrl());
 
-        // Actualizar categorías
+        //Actualizar categorías
         Set<Category> newCats = dto.getCategories().stream()
                 .map(catId -> categoryRepository.findById(catId)
                         .orElseThrow(() -> new RuntimeException("Categoría no encontrada")))
                 .collect(Collectors.toSet());
         recipe.setCategories(newCats);
 
-        // Ingredientes (reemplazar)
+        //Ingredientes
         recipe.getRecipeIngredients().clear();
         for (RecipeIngredientsDTO ing : dto.getIngredients()) {
             RecipeIngredient ri = new RecipeIngredient();
@@ -135,7 +132,7 @@ public class RecipeService {
             recipe.getRecipeIngredients().add(ri);
         }
 
-        // Pasos
+        //Pasos
         recipe.getSteps().clear();
         int index = 1;
         for (String instruction : dto.getSteps()) {
@@ -172,16 +169,16 @@ public class RecipeService {
         dto.setImageUrl(recipe.getImageUrl());
         dto.setAuthorEmail(recipe.getAuthor().getEmail());
         dto.setAuthorUsername(recipe.getAuthor().getUsername());
+        dto.setAuthorId(recipe.getAuthor().getUserId());
 
-
-        // Categorías
+        //Categorías
         List<String> categoryNames = recipe.getCategories()
                 .stream()
                 .map(Category::getName)
                 .toList();
         dto.setCategoryNames(categoryNames);
 
-        // Ingredientes
+        //Ingredientes
         List<RecipeIngredientDTO> ingredients = recipe.getRecipeIngredients()
                 .stream()
                 .map(ri -> new RecipeIngredientDTO(
@@ -192,7 +189,7 @@ public class RecipeService {
                 .toList();
         dto.setIngredients(ingredients);
 
-        // Pasos
+        //Pasos
         List<String> steps = recipe.getSteps()
                 .stream()
                 .sorted(Comparator.comparing(RecipeStep::getStep_number)) // Asegura orden
@@ -203,39 +200,6 @@ public class RecipeService {
         return dto;
     }
 
-    /*public List<RecipeSummaryDTO> getAllRecipes() {
-        List<Recipe> recipes = recipeRepository.findAll();
-
-        return recipes.stream().map(r -> new RecipeSummaryDTO(
-                r.getRecipeId(),
-                r.getTitle(),
-                r.getImageUrl(),
-                r.getDescription().length() > 100
-                        ? r.getDescription().substring(0, 100) + "..."
-                        : r.getDescription()
-        )).toList();
-    }*/
-    /*public List<RecipeSummaryDTO> getAllRecipes() {
-        List<Recipe> recipes = recipeRepository.findAll();
-
-        return recipes.stream().map(r -> {
-            double avgRating = commentRepository.findByRecipe(r)
-                    .stream()
-                    .mapToInt(RecipeComment::getRating)
-                    .average()
-                    .orElse(0);
-
-            return new RecipeSummaryDTO(
-                    r.getRecipeId(),
-                    r.getTitle(),
-                    r.getImageUrl(),
-                    r.getDescription().length() > 100
-                            ? r.getDescription().substring(0, 100) + "..."
-                            : r.getDescription(),
-                    avgRating
-            );
-        }).toList();
-    }*/
     public List<RecipeSummaryDTO> getAllRecipes(String search) {
         List<Recipe> recipes;
 
@@ -264,44 +228,6 @@ public class RecipeService {
         }).toList();
     }
 
-    /*public List<RecipeSummaryDTO> getRecipesByAuthor(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Autor no encontrado"));
-
-        List<Recipe> recipes = recipeRepository.findByAuthor(user);
-        return recipes.stream().map(r -> new RecipeSummaryDTO(
-                r.getRecipeId(),
-                r.getTitle(),
-                r.getImageUrl(),
-                r.getDescription().length() > 100
-                        ? r.getDescription().substring(0, 100) + "..."
-                        : r.getDescription()
-        )).toList();
-    }*/
-    /*public List<RecipeSummaryDTO> getRecipesByAuthor(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Autor no encontrado"));
-
-        List<Recipe> recipes = recipeRepository.findByAuthor(user);
-
-        return recipes.stream().map(r -> {
-            double avgRating = commentRepository.findByRecipe(r)
-                    .stream()
-                    .mapToInt(RecipeComment::getRating)
-                    .average()
-                    .orElse(0);
-
-            return new RecipeSummaryDTO(
-                    r.getRecipeId(),
-                    r.getTitle(),
-                    r.getImageUrl(),
-                    r.getDescription().length() > 100
-                            ? r.getDescription().substring(0, 100) + "..."
-                            : r.getDescription(),
-                    avgRating
-            );
-        }).toList();
-    }*/
     public List<RecipeSummaryDTO> getRecipesByAuthor(String email, String search) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Autor no encontrado"));
@@ -350,7 +276,7 @@ public class RecipeService {
             recipes = recipeRepository.findAll();
         }
 
-        // Filtros en memoria combinados
+        // Filtros combinados
         return recipes.stream()
                 .filter(r -> search == null || r.getTitle().toLowerCase().contains(search.toLowerCase()))
                 .filter(r -> maxPrepTime == null || r.getPrepTime() <= maxPrepTime)

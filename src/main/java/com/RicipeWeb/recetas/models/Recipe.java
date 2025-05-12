@@ -44,6 +44,9 @@ public class Recipe {
     private Set<RecipeIngredient> recipeIngredients = new HashSet<>();
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("step_number ASC") // opcional, para mantener el orden
+    @OrderBy("step_number ASC") // para mantener el orden
     private List<RecipeStep> steps = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecipeComment> comments = new ArrayList<>();
 }

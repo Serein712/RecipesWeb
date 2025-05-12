@@ -1,4 +1,5 @@
 package com.RicipeWeb.recetas.repositories;
+
 import com.RicipeWeb.recetas.models.Ingredient;
 import org.springframework.data.jpa.repository.JpaRepository;
 

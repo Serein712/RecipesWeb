@@ -1,11 +1,9 @@
 package com.RicipeWeb.recetas.config;
 
 import com.RicipeWeb.recetas.services.CustomUserDetailsService;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -39,7 +37,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/home","/api/auth/login", "/api/users", "/api/users/register",
                                 "/api/ingredients", "/api/units", "/api/categories",
                                 "/api/recipes", "/api/recipes/{id}",
-                                "/api/recipes/{id}/rating", "/api/recipes/{id}/comments").permitAll()
+                                "/api/recipes/{id}/rating", "/api/recipes/{id}/comments",
+                                "/api/publishers/{id}").permitAll()
                         .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)

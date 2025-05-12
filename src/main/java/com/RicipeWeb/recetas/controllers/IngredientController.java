@@ -1,9 +1,7 @@
 package com.RicipeWeb.recetas.controllers;
 
-
 import com.RicipeWeb.recetas.dtos.IngredientDTO;
 import com.RicipeWeb.recetas.services.IngredientService;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

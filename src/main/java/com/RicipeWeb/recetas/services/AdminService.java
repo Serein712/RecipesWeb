@@ -29,21 +29,14 @@ public class AdminService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-        // 1. Obtener todas las recetas del usuario
-        List<Recipe> recipes = recipeRepository.findByAuthor(user);
-
-        // 2. Eliminar todos los comentarios de esas recetas
+        List<Recipe> recipes = recipeRepository.findByAuthor(user); // Todas sus recetas
         for (Recipe recipe : recipes) {
-            commentRepository.deleteAllByRecipe(recipe);
+            commentRepository.deleteAllByRecipe(recipe); //Eliminar comentarios de esas recetas
         }
 
-        // 3. Eliminar las recetas
-        recipeRepository.deleteAll(recipes);
+        recipeRepository.deleteAll(recipes); //Eliminar las recetas
+        commentRepository.deleteAllByAuthor(user); //Eliminar sus comentarios
 
-        // 4. Eliminar los comentarios escritos por el usuario
-        commentRepository.deleteAllByAuthor(user);
-
-        // 5. Finalmente eliminar al usuario
         userRepository.delete(user);
     }
 }

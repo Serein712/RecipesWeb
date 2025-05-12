@@ -62,19 +62,7 @@ public class AdminController {
 
     @DeleteMapping("/users/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
-        /*User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
-
-        // Eliminar comentarios primero
-        commentRepository.deleteAllByAuthor(user);
-
-        // Eliminar recetas
-        recipeRepository.deleteAllByAuthor(user);
-
-        // Finalmente, eliminar el usuario
-        userRepository.delete(user);*/
         adminService.deleteUserById(id);
-
         return ResponseEntity.noContent().build();
     }
 

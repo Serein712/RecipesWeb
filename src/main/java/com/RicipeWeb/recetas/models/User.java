@@ -29,6 +29,9 @@ public class User {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @Column(nullable = true)
+    private String bio;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role = Role.USER;

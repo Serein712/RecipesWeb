@@ -38,23 +38,6 @@ public class RecipeController {
         return ResponseEntity.ok(createdRecipe);
     }
 
-    /*@GetMapping
-    public ResponseEntity<List<RecipeSummaryDTO>> getAllRecipes() {
-        List<RecipeSummaryDTO> recipeSummaries = recipeService.getAllRecipes();
-        return ResponseEntity.ok(recipeSummaries);
-    }*/
-
-    /*@GetMapping
-    public ResponseEntity<List<RecipeSummaryDTO>> getAllRecipes(
-            @RequestParam(required = false) String author) {
-
-        List<RecipeSummaryDTO> recipes = (author == null || author.isBlank())
-                ? recipeService.getAllRecipes()
-                : recipeService.getRecipesByAuthor(author);
-
-        return ResponseEntity.ok(recipes);
-    }*/
-
     @GetMapping
     public ResponseEntity<List<RecipeSummaryDTO>> getAllRecipes(
             @RequestParam(required = false) String author,
@@ -62,12 +45,6 @@ public class RecipeController {
             @RequestParam(required = false) Long category,
             @RequestParam(required = false) Integer minRating,
             @RequestParam(required = false) Integer maxPrepTime) {
-
-        /*System.out.println("getAllRecipes search: " + search);
-        System.out.println("author: " + author);
-        System.out.println("category: " + category);
-        System.out.println("minRating: " + minRating);
-        System.out.println("maxPrepTime: " + maxPrepTime);*/
 
         List<RecipeSummaryDTO> results = recipeService.filterRecipes(
                 search, author, category, minRating, maxPrepTime
@@ -85,9 +62,7 @@ public class RecipeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RecipeDTO> updateRecipe(
-            @PathVariable Long id,
-            @RequestBody RecipeRequestDTO dto,
+    public ResponseEntity<RecipeDTO> updateRecipe(@PathVariable Long id,@RequestBody RecipeRequestDTO dto,
             Principal principal) {
 
         String email = principal.getName(); // extraído del JWT

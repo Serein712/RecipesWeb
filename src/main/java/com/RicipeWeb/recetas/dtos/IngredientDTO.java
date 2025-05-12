@@ -14,5 +14,4 @@ public class IngredientDTO {
         this.name = name;
     }
 
-    // getters y setters
 }

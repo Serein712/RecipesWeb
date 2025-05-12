@@ -1,6 +1,5 @@
 package com.RicipeWeb.recetas.config;
 
-import com.RicipeWeb.recetas.services.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

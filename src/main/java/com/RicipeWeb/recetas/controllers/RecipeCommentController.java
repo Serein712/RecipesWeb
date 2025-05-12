@@ -17,13 +17,13 @@ public class RecipeCommentController {
     @Autowired
     private RecipeCommentService commentService;
 
-    // Obtener todos los comentarios de una receta
+    // Comentarios de una receta
     @GetMapping("/recipes/{id}/comments")
     public ResponseEntity<List<RecipeCommentDTO>> getComments(@PathVariable Long id) {
         return ResponseEntity.ok(commentService.getCommentsForRecipe(id));
     }
 
-    // Obtener promedio de valoraciones
+    // Promedio de valoraciones
     @GetMapping("/recipes/{id}/rating")
     public ResponseEntity<Double> getAverageRating(@PathVariable Long id) {
         return ResponseEntity.ok(commentService.getAverageRatingForRecipe(id));

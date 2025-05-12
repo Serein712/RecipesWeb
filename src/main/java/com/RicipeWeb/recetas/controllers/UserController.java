@@ -9,10 +9,7 @@ import com.RicipeWeb.recetas.repositories.UserRepository;
 import com.RicipeWeb.recetas.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -43,23 +40,6 @@ public class UserController {
         }
     }
 
-    /*@GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No autenticado");
-        }
-
-        String email = auth.getName(); // el email se usó como "username" en UserDetails
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-
-        UserMeDTO dto = new UserMeDTO(user.getUserId(), user.getUsername(), user.getEmail());
-
-        return ResponseEntity.ok(dto);
-    }*/
     @GetMapping("/me")
     public ResponseEntity<UserProfileDTO> getCurrentUser(Principal principal) {
         User user = userRepository.findByEmail(principal.getName())
@@ -68,8 +48,8 @@ public class UserController {
         UserProfileDTO dto = new UserProfileDTO();
         dto.setEmail(user.getEmail());
         dto.setRole(user.getRole().name());
-        dto.setName(user.getUsername()); // si tienes nombre
-        //dto.setCreatedAt(user.getCreatedAt()); // si tienes fecha de registro
+        dto.setName(user.getUsername());
+        //dto.setCreatedAt(user.getCreatedAt());
 
         return ResponseEntity.ok(dto);
     }
