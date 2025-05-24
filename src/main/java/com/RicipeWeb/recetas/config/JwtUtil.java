@@ -27,6 +27,7 @@ public class JwtUtil {
     }
 
     //Genera un token JWT con claims personalizados
+
     public String generateToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
